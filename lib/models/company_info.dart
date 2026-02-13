@@ -1,9 +1,11 @@
+import 'vendor_boat.dart';
+
 /// Company information model for River Buzz Partner App
 class CompanyInfo {
   final String id;
   final String name;
   final String businessLicenseNumber;
-  final String serviceType; // 'Boat Service' or 'Hotel/Stay'
+  final String serviceType; // 'Boat Service' or 'Rafting'
   final int maxCapacity;
   final double basePrice;
   final String accountHolderName;
@@ -12,6 +14,12 @@ class CompanyInfo {
   final String status; // 'Pending', 'Reviewing', 'Active', 'Rejected'
   final DateTime submittedDate;
   final String? applicationId;
+  /// Boat types offered (for Boat Service). e.g. ['Small', 'Large']
+  final List<String> boatTypes;
+  /// Pricing model: 'Hourly' | 'Per Person' (Boat) or 'Per Trip' | 'Per Person' (Rafting)
+  final String? pricingModel;
+  /// Multiple boats registered by vendor (Boat Service)
+  final List<VendorBoat> boats;
 
   CompanyInfo({
     required this.id,
@@ -26,7 +34,11 @@ class CompanyInfo {
     required this.status,
     required this.submittedDate,
     this.applicationId,
-  });
+    List<String>? boatTypes,
+    this.pricingModel,
+    List<VendorBoat>? boats,
+  })  : boatTypes = boatTypes ?? const [],
+        boats = boats ?? const [];
 
   // Convert to JSON
   Map<String, dynamic> toJson() {
@@ -43,11 +55,15 @@ class CompanyInfo {
       'status': status,
       'submittedDate': submittedDate.toIso8601String(),
       'applicationId': applicationId,
+      'boatTypes': boatTypes,
+      'pricingModel': pricingModel,
+      'boats': boats.map((e) => e.toJson()).toList(),
     };
   }
 
   // Create from JSON
   factory CompanyInfo.fromJson(Map<String, dynamic> json) {
+    final boatsList = json['boats'];
     return CompanyInfo(
       id: json['id'] as String,
       name: json['name'] as String,
@@ -61,6 +77,13 @@ class CompanyInfo {
       status: json['status'] as String,
       submittedDate: DateTime.parse(json['submittedDate'] as String),
       applicationId: json['applicationId'] as String?,
+      boatTypes: (json['boatTypes'] as List<dynamic>?)?.cast<String>() ?? [],
+      pricingModel: json['pricingModel'] as String?,
+      boats: boatsList != null
+          ? (boatsList as List<dynamic>)
+              .map((e) => VendorBoat.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
     );
   }
 
@@ -78,6 +101,9 @@ class CompanyInfo {
     String? status,
     DateTime? submittedDate,
     String? applicationId,
+    List<String>? boatTypes,
+    String? pricingModel,
+    List<VendorBoat>? boats,
   }) {
     return CompanyInfo(
       id: id ?? this.id,
@@ -92,6 +118,9 @@ class CompanyInfo {
       status: status ?? this.status,
       submittedDate: submittedDate ?? this.submittedDate,
       applicationId: applicationId ?? this.applicationId,
+      boatTypes: boatTypes ?? this.boatTypes,
+      pricingModel: pricingModel ?? this.pricingModel,
+      boats: boats ?? this.boats,
     );
   }
 }

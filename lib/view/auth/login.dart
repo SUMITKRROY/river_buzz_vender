@@ -66,6 +66,14 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          TextButton(
+            onPressed: () {
+              NavigationUtils.pushReplacementNamed(context, AppConstants.homeRoute);
+            },
+            child: const Text('Skip'),
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(

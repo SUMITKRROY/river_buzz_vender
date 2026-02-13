@@ -21,10 +21,82 @@ class AppConstants {
   static const String businessReportsRoute = '/business-reports';
   static const String chatRoute = '/chat';
   static const String helpSupportRoute = '/help-support';
+  static const String editPricingRoute = '/profile/edit-pricing';
+  static const String editBoatTypesRoute = '/profile/edit-boat-types';
+  static const String manageBoatsRoute = '/profile/manage-boats';
 
   // Service Types
   static const String boatService = 'Boat Service';
-  static const String hotelStay = 'Hotel/Stay';
+  static const String rafting = 'Rafting';
+
+  // Boat registration options
+  static const List<String> boatTypes = [
+    'Small',
+    'Large',
+    'Luxury',
+    'Event',
+    'Sharing',
+    'Motor',
+    'Non-motor',
+  ];
+  static const List<String> boatCategories = [
+    'Couple',
+    'Family',
+    'Group',
+    'VIP',
+  ];
+  /// Boat pricing: Hourly, Per Person, Event Package
+  static const List<String> boatPricingModels = ['Hourly', 'Per Person', 'Event Package'];
+  static const List<String> pricingModels = ['Hourly', 'Per Person'];
+  static const int minBoatPhotos = 3;
+  /// Boat availability status for list colors
+  static const String boatStatusAvailable = 'available';
+  static const String boatStatusBooked = 'booked';
+  static const String boatStatusPending = 'pending';
+  // Sample operating ghats (replace with API/data later)
+  static const List<String> operatingGhatsList = [
+    'Assi Ghat',
+    'Dashashwamedh Ghat',
+    'Manikarnika Ghat',
+    'Harishchandra Ghat',
+    'Panchenko Ghat',
+    'Raj Ghat',
+    'Shivala Ghat',
+    'Tulsi Ghat',
+  ];
+
+  // Rafting registration options
+  static const List<String> raftTypes = [
+    '2-Person',
+    '4-Person',
+    '6-Person',
+    '8-Person',
+    'Inflatable',
+    'Rigid',
+  ];
+  static const List<String> raftCategories = [
+    'Beginner',
+    'Intermediate',
+    'Advanced',
+    'Expert',
+  ];
+  static const List<String> raftDurationOptions = [
+    '2 Hours',
+    'Half Day',
+    'Full Day',
+    'Multi-day',
+  ];
+  static const List<String> raftRiversList = [
+    'Ganges',
+    'Alaknanda',
+    'Bhagirathi',
+    'Tons',
+    'Yamuna',
+    'Rishikesh Stretch',
+    'Other',
+  ];
+  static const List<String> raftPricingModels = ['Per Trip', 'Per Person'];
+  static const int minRaftPhotos = 3;
 
   // Status Types
   static const String statusPending = 'Pending';

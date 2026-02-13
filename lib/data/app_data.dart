@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/company_info.dart';
+import '../models/vendor_boat.dart';
 
 /// Application data and mock data for River Buzz Partner App
 class AppData {
@@ -53,7 +54,7 @@ class AppData {
   // Service types available
   static const List<String> serviceTypes = [
     'Boat Service',
-    'Hotel/Stay',
+    'Rafting',
   ];
 
   // Common bank names (for dropdown)
@@ -100,6 +101,30 @@ class AppData {
       status: 'Reviewing',
       submittedDate: DateTime.now().subtract(const Duration(days: 1)),
       applicationId: 'RB-99283',
+      boatTypes: const ['Small', 'Large', 'Motor'],
+      pricingModel: 'Hourly',
+      boats: [
+        const VendorBoat(
+          id: 'b1',
+          name: 'Sunrise Cruiser',
+          boatType: 'Large',
+          capacity: 8,
+          jacketCount: 8,
+          boatNumber: 'RB-001',
+          pricingModel: 'Hourly',
+          availabilityStatus: BoatAvailabilityStatus.available,
+        ),
+        const VendorBoat(
+          id: 'b2',
+          name: 'River Runner',
+          boatType: 'Motor',
+          capacity: 6,
+          jacketCount: 6,
+          boatNumber: 'RB-002',
+          pricingModel: 'Per Person',
+          availabilityStatus: BoatAvailabilityStatus.booked,
+        ),
+      ],
     );
   }
 
@@ -108,6 +133,73 @@ class AppData {
   static const int activeBookings = 4;
   static const String nextEventTime = '2:00 PM';
   static const String earningsTrend = '+12% vs avg';
+
+  // Home Dashboard - next ride (for countdown). Use null when no upcoming ride.
+  static DateTime? get nextRideDateTime {
+    final now = DateTime.now();
+    return now.add(const Duration(hours: 2, minutes: 15)); // e.g. 2h 15m from now
+  }
+
+  // Today total completed + upcoming rides count
+  static const int todayTotalRides = 7;
+
+  // Pending payout (awaiting transfer)
+  static const double pendingPayoutAmount = 340.00;
+
+  // Commission rate (e.g. 15%)
+  static const double commissionRatePercent = 15.0;
+
+  // Today net earnings after commission
+  static double get todayNetEarnings =>
+      todayEarnings * (1 - commissionRatePercent / 100);
+
+  // Weather alert: null = no alert; non-null = show banner (Weather Auto Alert System)
+  static const String? weatherAlert =
+      'Heavy rain expected after 4 PM. Consider rescheduling evening rides.';
+
+  // Safety Layer: Police river restriction — when true, show banner and allow force cancel
+  static bool get policeRiverRestriction => _policeRiverRestriction;
+  static bool _policeRiverRestriction = false; // Set true when admin/police restricts
+
+  static void setPoliceRiverRestriction(bool value) {
+    _policeRiverRestriction = value;
+  }
+
+  // Emergency SOS: call emergency number and share live location (stub for now)
+  static const String emergencyNumber = '112'; // Use local emergency number
+  static void triggerEmergencySos() {
+    // In production: launchUrl(Uri.parse('tel:$emergencyNumber'));
+    // and send current GPS to backend for emergency services
+  }
+
+  // Life jacket reminder: show once per session when vendor has active/upcoming ride
+  static bool _lifeJacketReminderShownThisSession = false;
+  static bool get shouldShowLifeJacketReminder {
+    if (_lifeJacketReminderShownThisSession) return false;
+    return nextRideDateTime != null;
+  }
+  static void markLifeJacketReminderShown() {
+    _lifeJacketReminderShownThisSession = true;
+  }
+
+  // Booking expiry alerts (flashing). Empty = none.
+  static const List<Map<String, dynamic>> bookingExpiryAlerts = [
+    {
+      'bookingId': 'RB-4425',
+      'message': 'Sarah Williams — Accept/Decline expires in 3 min',
+      'expiresInSeconds': 180,
+    },
+  ];
+
+  // New booking request (flashing card on top). Null = none.
+  static const Map<String, dynamic>? newBookingRequest = {
+    'bookingId': 'RB-4492',
+    'customerName': 'Alex Morgan',
+    'serviceName': 'Sunset River Cruise',
+    'time': '6:00 PM',
+    'guests': 4,
+    'receivedAt': 'Just now',
+  };
 
   // Recent activity items: type (booking|message|payment), title, detail, timeAgo, iconColor (green|blue|orange)
   static const List<Map<String, dynamic>> recentActivityItems = [
@@ -190,6 +282,83 @@ class AppData {
       };
     }
     return slots;
+  }
+
+  /// Gantt-style timeline blocks for Live Booking Sheet.
+  /// status: 'available' | 'booked' | 'expiring' | 'pending'
+  /// startMinute/endMinute: minutes from midnight (e.g. 480 = 8:00, 540 = 9:00)
+  static List<Map<String, dynamic>> getTimelineBlocks(DateTime day) {
+    // Demo: use 2 days from now for sample booked/expiring/pending data
+    final today = DateTime.now();
+    final demoDay = today.add(const Duration(days: 2));
+    final hasSampleData = day.day == demoDay.day && day.month == demoDay.month && day.year == demoDay.year;
+    if (!hasSampleData) {
+      return [
+        {'startMinute': 480, 'endMinute': 600, 'status': 'available'},
+        {'startMinute': 600, 'endMinute': 720, 'status': 'available'},
+        {'startMinute': 720, 'endMinute': 900, 'status': 'available'},
+        {'startMinute': 900, 'endMinute': 1080, 'status': 'available'},
+      ];
+    }
+    // Rich sample data: available, booked, expiring, pending
+    return [
+      {'startMinute': 480, 'endMinute': 540, 'status': 'available'},
+      {'startMinute': 540, 'endMinute': 630, 'status': 'booked', 'customerName': 'John Smith', 'bookingId': 'RB-4421', 'persons': 4, 'serviceName': 'Standard Kayak Tour', 'serviceIconKey': 'kayak'},
+      {'startMinute': 630, 'endMinute': 690, 'status': 'expiring', 'customerName': 'Sarah Williams', 'bookingId': 'RB-4425', 'persons': 2, 'serviceName': 'Private Motorboat', 'serviceIconKey': 'boat', 'expiresInSeconds': 180},
+      {'startMinute': 690, 'endMinute': 750, 'status': 'available'},
+      {'startMinute': 750, 'endMinute': 810, 'status': 'pending', 'customerName': 'Alex Morgan', 'bookingId': 'RB-4428', 'persons': 3, 'serviceName': 'River Tour Request', 'serviceIconKey': 'boat'},
+      {'startMinute': 810, 'endMinute': 900, 'status': 'available'},
+      {'startMinute': 900, 'endMinute': 1020, 'status': 'booked', 'customerName': 'Michael Brown', 'bookingId': 'RB-4430', 'persons': 6, 'serviceName': 'River Rafting Adventure', 'serviceIconKey': 'rafting'},
+      {'startMinute': 1020, 'endMinute': 1080, 'status': 'booked', 'customerName': 'Emma Davis', 'bookingId': 'RB-4438', 'persons': 1, 'serviceName': 'Solo Kayak Rental', 'serviceIconKey': 'kayak'},
+    ];
+  }
+
+  /// Expiring bookings for alert indicator on Live Booking Sheet
+  static List<Map<String, dynamic>> getTimelineExpiringAlerts(DateTime day) {
+    final blocks = getTimelineBlocks(day);
+    return blocks.where((b) => b['status'] == 'expiring').toList();
+  }
+
+  /// Customers list for selected day (from timeline blocks) + recent customers
+  static List<Map<String, dynamic>> getBookingSheetCustomers(DateTime day) {
+    final blocks = getTimelineBlocks(day);
+    final fromBlocks = blocks
+        .where((b) => b['status'] != 'available' && b['customerName'] != null)
+        .map((b) => {
+              'name': b['customerName'],
+              'bookingId': b['bookingId'],
+              'persons': b['persons'] ?? 0,
+              'serviceName': b['serviceName'],
+              'status': b['status'],
+              'startMinute': b['startMinute'],
+              'endMinute': b['endMinute'],
+            })
+        .toList();
+    if (fromBlocks.isNotEmpty) return fromBlocks;
+    // Fallback: sample customers from conversations
+    return conversations.take(6).map((c) => {
+          'name': c['name'],
+          'bookingId': null,
+          'persons': null,
+          'serviceName': 'Previous booking',
+          'status': 'booked',
+        }).toList();
+  }
+
+  /// Insights for Live Booking Sheet (selected day stats)
+  static Map<String, dynamic> getBookingSheetInsights(DateTime day) {
+    final blocks = getTimelineBlocks(day);
+    final booked = blocks.where((b) => b['status'] != 'available').length;
+    final available = blocks.where((b) => b['status'] == 'available').length;
+    final totalSlots = blocks.length;
+    final utilization = totalSlots > 0 ? (booked / totalSlots * 100).round() : 0;
+    return {
+      'totalBookings': booked,
+      'availableSlots': available,
+      'utilizationPercent': utilization,
+      'peakHours': '2PM - 5PM',
+      'revenueEstimate': booked * 120.0,
+    };
   }
 
   // Vendor Wallet

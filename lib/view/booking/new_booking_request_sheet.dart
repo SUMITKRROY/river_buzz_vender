@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../config/theam_data.dart';
-import '../../constants/app_constants.dart';
-import '../../utils/navigation_utils.dart';
 
 /// Bottom sheet: New Booking Request with Accept / Decline
 class NewBookingRequestSheet extends StatefulWidget {
@@ -41,6 +39,76 @@ class _NewBookingRequestSheetState extends State<NewBookingRequestSheet> {
     return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
+  void _showConfirmationBottomSheet(BuildContext context, bool accepted) {
+    Navigator.of(context).pop(); // close request sheet first
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: const BoxDecoration(
+          color: AppTheme.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.spacingL,
+              vertical: AppTheme.spacingXL,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  accepted ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                  size: 56,
+                  color: accepted ? AppTheme.successGreen : AppTheme.errorRed,
+                ),
+                const SizedBox(height: AppTheme.spacingM),
+                Text(
+                  accepted ? 'Booking Accepted' : 'Booking Declined',
+                  style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimary,
+                      ),
+                ),
+                const SizedBox(height: AppTheme.spacingS),
+                Text(
+                  accepted
+                      ? 'You have accepted this booking request.'
+                      : 'You have declined this booking request.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                ),
+                const SizedBox(height: AppTheme.spacingL),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: accepted
+                          ? AppTheme.successGreen
+                          : AppTheme.primaryBlue,
+                      foregroundColor: AppTheme.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.borderRadiusMedium),
+                      ),
+                    ),
+                    child: const Text('Done'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -50,9 +118,10 @@ class _NewBookingRequestSheetState extends State<NewBookingRequestSheet> {
       ),
       child: SafeArea(
         top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             const SizedBox(height: 12),
             // Handle
             Container(
@@ -199,10 +268,7 @@ class _NewBookingRequestSheetState extends State<NewBookingRequestSheet> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    NavigationUtils.pushNamed(context, AppConstants.bookingConfirmationRoute);
-                  },
+                  onPressed: () => _showConfirmationBottomSheet(context, true),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.successGreen,
                     foregroundColor: AppTheme.white,
@@ -230,7 +296,7 @@ class _NewBookingRequestSheetState extends State<NewBookingRequestSheet> {
                 width: double.infinity,
                 height: 52,
                 child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => _showConfirmationBottomSheet(context, false),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppTheme.errorRed,
                     side: const BorderSide(color: AppTheme.errorRed),
@@ -250,7 +316,8 @@ class _NewBookingRequestSheetState extends State<NewBookingRequestSheet> {
               ),
             ),
             const SizedBox(height: 24),
-          ],
+            ],
+          ),
         ),
       ),
     );

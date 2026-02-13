@@ -1,11 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../config/theam_data.dart';
 import '../../constants/app_constants.dart';
+import '../../data/app_data.dart';
 import '../../utils/navigation_utils.dart';
 
-/// Active Ride: map placeholder, elapsed time, customer card, End Ride button
+/// Step 4 — Active Ride: map, elapsed time, customer card,
+/// Call Customer, Chat, End Ride button (vendor toolkit) + Safety SOS
 class ActiveRideScreen extends StatelessWidget {
   const ActiveRideScreen({super.key});
+
+  void _onSosPressed(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
+        ),
+        title: const Row(
+          children: [
+            Icon(Icons.emergency_rounded, color: AppTheme.errorRed, size: 28),
+            SizedBox(width: AppTheme.spacingS),
+            Text('Emergency SOS'),
+          ],
+        ),
+        content: const Text(
+          'Your location will be shared with emergency services. '
+          'Tap "Call Emergency" to dial the emergency number.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton.icon(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              AppData.triggerEmergencySos();
+              final uri = Uri.parse('tel:${AppData.emergencyNumber}');
+              if (await canLaunchUrl(uri)) {
+                launchUrl(uri);
+              }
+            },
+            icon: const Icon(Icons.phone_rounded, size: 20),
+            label: const Text('Call Emergency'),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.errorRed,
+              foregroundColor: AppTheme.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +89,14 @@ class ActiveRideScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.more_vert_rounded),
             onPressed: () {},
+          ),
+          IconButton(
+            onPressed: () => _onSosPressed(context),
+            icon: const Icon(Icons.emergency_rounded),
+            tooltip: 'SOS',
+            style: IconButton.styleFrom(
+              foregroundColor: AppTheme.errorRed,
+            ),
           ),
         ],
       ),
@@ -179,9 +235,14 @@ class ActiveRideScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () {},
+                            onPressed: () async {
+                              final uri = Uri(scheme: 'tel', path: '+15551234567');
+                              if (await canLaunchUrl(uri)) {
+                                await launchUrl(uri);
+                              }
+                            },
                             icon: const Icon(Icons.call_rounded, size: 20),
-                            label: const Text('Call'),
+                            label: const Text('Call Customer'),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppTheme.primaryBlue,
                               side: const BorderSide(color: AppTheme.primaryBlue),
@@ -191,7 +252,9 @@ class ActiveRideScreen extends StatelessWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: () {},
+                            onPressed: () {
+                              NavigationUtils.pushNamed(context, AppConstants.chatRoute);
+                            },
                             icon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
                             label: const Text('Chat'),
                             style: ElevatedButton.styleFrom(

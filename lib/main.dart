@@ -7,7 +7,6 @@ import 'data/app_data.dart';
 void main() {
   // Initialize sample data for development
   AppData.initializeSampleData();
-  
   runApp(const MyApp());
 }
 

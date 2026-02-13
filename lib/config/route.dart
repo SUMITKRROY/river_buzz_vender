@@ -15,6 +15,9 @@ import '../view/wallet/withdraw_funds_screen.dart';
 import '../view/reports/business_reports_screen.dart';
 import '../view/chat_screen.dart';
 import '../view/support/help_support_screen.dart';
+import '../view/profile/edit_pricing_screen.dart';
+import '../view/profile/edit_boat_types_screen.dart';
+import '../view/profile/manage_boats_screen.dart';
 
 /// Application routing configuration
 class AppRoutes {
@@ -112,6 +115,24 @@ class AppRoutes {
       case AppConstants.helpSupportRoute:
         return MaterialPageRoute(
           builder: (_) => const HelpSupportScreen(),
+          settings: settings,
+        );
+
+      case AppConstants.editPricingRoute:
+        return MaterialPageRoute(
+          builder: (_) => const EditPricingScreen(),
+          settings: settings,
+        );
+
+      case AppConstants.editBoatTypesRoute:
+        return MaterialPageRoute(
+          builder: (_) => const EditBoatTypesScreen(),
+          settings: settings,
+        );
+
+      case AppConstants.manageBoatsRoute:
+        return MaterialPageRoute(
+          builder: (_) => const ManageBoatsScreen(),
           settings: settings,
         );
 

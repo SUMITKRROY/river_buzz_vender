@@ -100,7 +100,46 @@ class AccountScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: AppTheme.spacingS),
-                if (isVerified)
+                // KYC Status Badge (Verified / Pending)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppTheme.spacingM,
+                    vertical: AppTheme.spacingXS,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isVerified
+                        ? AppTheme.lightBlue
+                        : AppTheme.accentOrange.withValues(alpha: 0.15),
+                    borderRadius:
+                        BorderRadius.circular(AppTheme.borderRadiusPill),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isVerified
+                            ? Icons.verified_rounded
+                            : Icons.pending_rounded,
+                        size: 18,
+                        color: isVerified
+                            ? AppTheme.primaryBlue
+                            : AppTheme.accentOrange,
+                      ),
+                      const SizedBox(width: AppTheme.spacingXS),
+                      Text(
+                        isVerified ? 'KYC Verified' : 'KYC Pending',
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                              color: isVerified
+                                  ? AppTheme.primaryBlue
+                                  : AppTheme.accentOrange,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isVerified) ...[
+                  const SizedBox(height: AppTheme.spacingXS),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppTheme.spacingM,
@@ -119,6 +158,7 @@ class AccountScreen extends StatelessWidget {
                           ),
                     ),
                   ),
+                ],
               ],
             ),
           ),
@@ -140,6 +180,40 @@ class AccountScreen extends StatelessWidget {
             value: '${company.maxCapacity} Persons',
             onTap: () {},
           ),
+          _ProfileTile(
+            icon: Icons.attach_money_rounded,
+            iconColor: AppTheme.primaryBlue,
+            title: 'Edit Pricing',
+            value: company.pricingModel != null
+                ? '\$${company.basePrice.toStringAsFixed(0)} ${company.pricingModel}'
+                : '\$${company.basePrice.toStringAsFixed(0)}',
+            onTap: () =>
+                Navigator.pushNamed(context, AppConstants.editPricingRoute),
+          ),
+          if (company.serviceType == AppConstants.boatService) ...[
+            _ProfileTile(
+              icon: Icons.category_rounded,
+              iconColor: AppTheme.primaryBlue,
+              title: 'Edit Boat Types',
+              value: company.boatTypes.isEmpty
+                  ? 'Not set'
+                  : company.boatTypes.take(3).join(', ') +
+                      (company.boatTypes.length > 3 ? '...' : ''),
+              onTap: () =>
+                  Navigator.pushNamed(context, AppConstants.editBoatTypesRoute),
+            ),
+            _ProfileTile(
+              icon: Icons.directions_boat_outlined,
+              iconColor: AppTheme.primaryBlue,
+              title: 'My Boats',
+              subtitle: 'Add & manage multiple boats',
+              value: company.boats.isEmpty
+                  ? '0 boats'
+                  : '${company.boats.length} boat${company.boats.length == 1 ? '' : 's'}',
+              onTap: () =>
+                  Navigator.pushNamed(context, AppConstants.manageBoatsRoute),
+            ),
+          ],
           const SizedBox(height: AppTheme.spacingL),
 
           // ACCOUNT SETTINGS
